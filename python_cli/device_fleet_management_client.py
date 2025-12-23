@@ -2,8 +2,8 @@
 #!/usr/bin/env python3
 import grpc
 from google.protobuf import empty_pb2
-import devicefleetmanagement_pb2 as pb
-import devicefleetmanagement_pb2_grpc as stubs
+import device_fleet_management_pb2 as pb
+import device_fleet_management_pb2_grpc as stubs
 
 
 def device_status_name(value: int) -> str:
@@ -130,3 +130,4 @@ def run_client():
 
 if __name__ == "__main__":
     run_client()
+
