@@ -1,25 +1,27 @@
-DeviceFleetManagement
+**DeviceFleetManagement**
 A minimal yet extensible system to manage a fleet of devices via a C++ backend service (gRPC-style) and a Python CLI client. This README covers setup, build/run instructions on Linux, the .proto service definition, architecture overview, usage examples for all API functions, and assumptions/improvements.
 
-1. Prerequisites (Linux)
+**Prerequisites (Linux)**
 Build tools: g++ (or clang++), make (optional)
 Python: 3.8+
 gRPC/Proto: Install protoc and Python/C++ gRPC plugins bash # Ubuntu/Debian example sudo apt-get update && sudo apt-get install -y build-essential python3 python3-venv python3-pip protobuf-compiler # Optional: gRPC plugins python3 -m pip install grpcio grpcio-tools
 If you are using raw sockets/HTTP without gRPC, protoc is not required. The provided .proto serves as a contract/reference and can be adopted later.
+• Protocol Buffers compiler (protoc)
+• gRPC C++ libraries and grpc_cpp_plugin (via vcpkg or source build)
 
-2. Project Layout (suggested)
+**Project Layout (suggested)**
 DeviceFleetManagement/
 ├── cpp_server/
 │   ├── device_fleet_managemet_server.cc
 |   |── device_fleet_management.h
-│   └── Makefile (optional)
 ├── python_cli/
 │   └── device_fleet_managemet_client.py
 ├── proto/
 │   └── device_fleet_management.proto
 └── README.md
-3. Setup, Build, and Run
-3.a Build & Run the C++ Backend Service
+
+**Setup, Build, and Run**
+a) Build & Run the C++ Backend Service
 Compile:
 
 cd cpp_server
@@ -30,7 +32,7 @@ Run the server:
 ./device_fleet_managemet_server
 The server listens on the configured port (e.g., localhost:50051 for gRPC or localhost:8080 for HTTP). Adjust inside device_fleet_managemet_server.cc as needed.
 
-3.b Run the Python CLI Application
+b) Run the Python CLI Application
 Make script executable & run:
 
 cd ..python_cli/python_cli
@@ -38,8 +40,8 @@ chmod +x device_fleet_managemet_client.py
 ./device_fleet_managemet_client.py
 Ensure the CLI is configured to reach the server host/port (env var or inline config in the script).
 
-4. The .proto Service Definition
-The following proto defines the service contract used by the backend and CLI. If you are not using gRPC yet, treat this as a specification for your APIs and data structures.
+**The .proto Service Definition**
+The following proto defines the service contract used by the backend and CLI(device_fleet_management.proto). Treat this as a specification for your APIs and data structures.
 
 syntax = "proto3";
 package devicefleet;
@@ -84,26 +86,17 @@ service DeviceFleetService {
 }
 Generate stubs (optional):
 
-# Python client stubs
-python -m grpc_tools.protoc -Iproto \
-  --python_out=python_cli \
-  --grpc_python_out=python_cli \
-  proto/device_fleet_management.proto
 
-# C++ server stubs (requires grpc plugins installed)
-protoc -I proto device_fleet_management.proto \
-  --grpc_out=cpp_server --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` \
-  --cpp_out=cpp_server
-5. Architecture Overview
+**Architecture Overview**
 Core idea: A thin Python CLI interacts with a stateless C++ backend service. The backend maintains in-memory (or pluggable) state for devices and actions.
 
 Data flow: 1. User selects an operation in the CLI (1–5). 2. CLI collects required input (e.g., device ID, action ID) and sends a request to the server over gRPC. 3. Server validates input, performs the requested operation, and returns a response. 4. CLI prints the result and returns to the main menu until the user exits.
 
-Components: - C++ Backend: Implements DeviceFleetService with operations for register/remove/list/get/update. - Python CLI: Provides interactive menu, serializes user input into request messages, displays responses. - Transport: gRPC preferred (typed contracts via .proto). HTTP/JSON can be used initially for simplicity.
+Components: - C++ Backend: Implements DeviceFleetService with operations for register/remove/list/get/update. - Python CLI: Provides interactive menu, serializes user input into request messages, displays responses. - Transport: gRPC preferred (typed contracts via .proto).
 
 Deployment model: Local development on Linux; extendable to containerized deployments (Docker) and remote services.
 
-6. CLI Usage — Detailed Examples for All API Functions
+**CLI Usage — Detailed Examples for All API Functions**
 When you run the CLI, you will see:
 
 Select service to call:
@@ -113,7 +106,7 @@ Select service to call:
 4. GetDeviceAction
 5. UpdateDeviceAction
 Any other number to exit
-6.1 RegisterDevice
+1 RegisterDevice
 Input prompts:
 
 Enter Device ID: dev-001
@@ -122,20 +115,20 @@ Enter Device Type: thermostat
 Expected output (example):
 
 [RegisterDevice] success=true message="Device registered"
-6.2 RemoveDevice
+2 RemoveDevice
 Input prompt:
 
 Enter Device ID to remove: dev-001
 Expected output:
 
 [RemoveDevice] success=true message="Device removed"
-6.3 ListDevices
+3 ListDevices
 No input required. Expected output:
 
 Devices:
 - id=dev-001 name="Thermostat Living Room" type=thermostat
 - id=dev-002 name="Light Kitchen" type=light
-6.4 GetDeviceAction
+4 GetDeviceAction
 Current implementation assumption: Action is fetched by Action ID only. Input prompt:
 
 Enter Action ID: act-123
@@ -144,7 +137,7 @@ Expected output:
 
 Action:
 - action_id=act-123 device_id=dev-001 command="set_temp:22"
-6.5 UpdateDeviceAction
+5 UpdateDeviceAction
 Input prompts:
 
 Enter Action ID: act-123
@@ -153,7 +146,8 @@ Enter Command: set_temp:24
 Expected output:
 
 [UpdateDeviceAction] success=true message="Action updated"
-7. Assumptions, Simplifications, and Next Steps
+
+**Assumptions, Simplifications, and Next Steps**
 Error Handling: Minimal in current version. Add robust exception handling, input validation, and negative-path tests.
 GetDeviceAction: Currently uses only action_id. Adding device_id is recommended for clarity and maintenance.
 CLI UX: Implement a cleaner infinite loop, better prompts, and validation for numeric menu selection.
@@ -161,8 +155,7 @@ State Management: In-memory structures assumed. Consider persistence (SQLite/Pos
 Authentication: None in current version. Add API keys or OAuth for secure operations if exposed remotely.
 Logging/Observability: Add structured logging, metrics, and tracing for debugging.
 Containerization: Provide Dockerfiles and CI/CD workflows for reproducible builds.
-8. Troubleshooting
+
+**Troubleshooting**
 Ensure the server is running before starting the CLI.
 Check that CLI target host/port matches the server.
-If using gRPC, confirm stubs are generated and imports resolved.
-Use strace/lsof to verify port binding on Linux if the CLI cannot connect.
