@@ -76,7 +76,6 @@ Generate stubs using `protoc` + language-specific plugins.
 ---
 
 ## 🏗 Architecture
-![Architecture Diagram](architecture.png)
 
 **Flow:**
 1. **Python CLI** sends request → **C++ Backend**
@@ -119,3 +118,4 @@ Example:
 - Verify firewall settings
 
 ---
+
