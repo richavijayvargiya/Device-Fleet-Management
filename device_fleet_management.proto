@@ -1,0 +1,69 @@
+syntax = "proto3";
+ 
+package devicefleetmanagement;
+ 
+service DeviceFleetManagement {
+  rpc RegisterDevice (Device ) returns (noParam);
+  rpc SetDeviceStatus (Device ) returns (noParam);
+  rpc GetDeviceInfo (GetDeviceInfoRequest) returns (GetDeviceInfoReply);
+  rpc InitiateDeviceAction (InitiateDeviceActionRequest) returns (InitiateDeviceActionReply);
+  rpc GetDeviceAction (GetDeviceActionRequest) returns (GetDeviceActionReply);
+}
+
+ enum DeviceStatus{
+    STATUS_IDLE = 0;
+    STATUS_BUSY = 1;
+    STATUS_OFFLINE= 2;
+    STATUS_MAINTENANCE= 3;
+    STATUS_UPDATING = 4;
+    STATUS_RECOVERING = 5;
+    STATUS_ERROR = 6;
+  }
+
+enum ActionType{
+    SOFTWARE_UPDATE = 0;
+  }
+
+enum ActionStatus{
+   ACTION_PENDING = 0;
+   ACTION_RUNING = 1;
+   ACTION_COMPLETED = 2;
+   ACTION_FAILED = 3;
+  }
+
+message noParam{ 
+}
+
+message Device {
+  int32 device_id = 1;
+  DeviceStatus status = 2;
+}
+
+ message GetDeviceInfoRequest {
+  int32 device_id = 1;
+}
+ 
+message GetDeviceInfoReply {
+  DeviceStatus currentl_state = 1;
+  string info = 2;
+}
+
+message InitiateDeviceActionRequest {
+  int32 device_id = 1;
+  ActionType action_type = 2;
+  string action_param = 3;
+}
+ 
+message InitiateDeviceActionReply {
+  int32 action_id = 1;
+  DeviceStatus state = 2;
+}
+
+message GetDeviceActionRequest {
+ int32 device_id = 1;
+ int32 action_id = 2;
+}
+ 
+message GetDeviceActionReply {
+  ActionStatus action_status= 1;
+}
