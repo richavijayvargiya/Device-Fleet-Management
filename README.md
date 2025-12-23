@@ -50,6 +50,20 @@ DeviceFleetManagement/
 
 ## ▶️ Build & Run
 
+### First, compile the Protocol Buffers:
+
+#### For C++ Server
+```bash
+protoc -I proto/ \
+  --cpp_out=server/src/ \
+  --grpc_out=server/src/ \
+  --plugin=protoc-gen-grpc=$(which grpc_cpp_plugin) \
+  proto/device_service.proto
+
+protoc -I proto device_fleet_management.proto \
+  --grpc_out=cpp_server --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` \
+  --cpp_out=cpp_server
+
 ### **C++ Backend**
 ```bash
 cd cpp_server
@@ -118,4 +132,5 @@ Example:
 - Verify firewall settings
 
 ---
+
 
