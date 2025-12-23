@@ -51,18 +51,18 @@ DeviceFleetManagement/
 ## ▶️ Build & Run
 
 ### First, compile the Protocol Buffers:
-
-#### For C++ Server
 ```bash
-protoc -I proto/ \
-  --cpp_out=server/src/ \
-  --grpc_out=server/src/ \
+#### For C++ Server
+protoc -I . \
+  --cpp_out=cpp_server/ \
+  --grpc_out=cpp_server/ \
   --plugin=protoc-gen-grpc=$(which grpc_cpp_plugin) \
-  proto/device_service.proto
+  device_fleet_management.proto
 
-protoc -I proto device_fleet_management.proto \
-  --grpc_out=cpp_server --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` \
-  --cpp_out=cpp_server
+#### For Python client
+python -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. device_fleet_management.proto
+```
+---
 
 ### **C++ Backend**
 ```bash
@@ -132,5 +132,6 @@ Example:
 - Verify firewall settings
 
 ---
+
 
 
