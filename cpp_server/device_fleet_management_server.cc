@@ -3,7 +3,7 @@
 
 #include "device_fleet_management.h"           // Must declare DevicePool, Device, etc.
 #include <grpcpp/grpcpp.h>
-#include "devicefleetmanagement.grpc.pb.h"
+#include "device_fleet_management.grpc.pb.h"
 
 #include <string>
 #include <future>
@@ -124,3 +124,4 @@ int main() {
     RunServer();
     return 0;
 }
+
